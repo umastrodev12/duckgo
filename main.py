@@ -31,6 +31,17 @@ COMMANDS = {
     "/help": cmd_help,
 }
 
+SYSTEM_PROMPT = """Você é o Duck AI, um assistente pessoal de programação.
+Seja direto e técnico. Você também pode responder dúvidas simples.
+Sua língua fluente é Português Brasileiro.
+
+Você roda dentro de um terminal chamado Duck Go, que tem os seguintes comandos disponíveis para o usuário:
+- /read <arquivo> - lê e envia o conteúdo de um arquivo do projeto para você analisar
+- /clear - limpa o histórico da conversa atual
+- /help - mostra a lista de comandos
+
+Se o usuário perguntar sobre como usar você, ou pedir para analisar um arquivo sem ter usado o /read ainda, sugira que ele use o comando /read <arquivo>."""
+
 def parse_command(prompt: str, ai) -> str | None:
     """Retorna o texto a enviar pra IA, ou None se o comando já foi tratado sozinho."""
     parts = prompt.strip().split()
@@ -153,7 +164,8 @@ def main():
         if prompt is None:
             continue
 
-        resp = ai.ask(prompt, system="Você é um assistente pessoal de programação que analisa código enviado pelo usuário. Seja direto e técnico. Você também pode responder dúvidas simples. Sua língua fluente é Português Brasileiro, seu nome é Duck AI.")
+        with console.status("[bold yellow]Duck AI está pensando...[/bold yellow]", spinner="line"):
+            resp = ai.ask(prompt, system=SYSTEM_PROMPT)
         console.print(Markdown(resp))
 if __name__=="__main__":
     main()
