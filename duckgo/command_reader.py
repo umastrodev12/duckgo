@@ -1,4 +1,5 @@
 from rich.console import Console
+from duckgo.tools import write_file
 import os
 
 console = Console()
@@ -35,4 +36,24 @@ def cmd_help(args: list[str]) -> None:
 def cmd_clear(args: list[str], ai) -> None:
     ai.history.clear()
     console.print("[dim]Histórico limpo.[/dim]")
+    return None
+
+def cmd_write(args: list[str]) -> str | None:
+    if not args:
+        console.print("[red]Uso: /write <arquivo>[/red]")
+        return None
+
+    path = args[0]
+    console.print("[bold]Digite o conteúdo (finalize com uma linha só 'END'):[/bold]")
+
+    lines = []
+    while True:
+        line = console.input()
+        if line.strip() == "END":
+            break
+        lines.append(line)
+
+    content = "\n".join(lines)
+    result = write_file(path, content)
+    console.print(f"[green]{result}[/green]")
     return None

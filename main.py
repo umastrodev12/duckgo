@@ -1,9 +1,11 @@
 from duckgo.global_dir import globalDir
 from duckgo.groq.ai_client import AIClient
+from duckgo.tools import write_file, WRITE_TOOL
 from duckgo.command_reader import (
     cmd_clear,
     cmd_help,
-    cmd_read
+    cmd_read,
+    cmd_write,
 )
 from rich.markdown import Markdown
 from rich.panel import Panel
@@ -29,6 +31,12 @@ LOGO = """
 COMMANDS = {
     "/read": cmd_read,
     "/help": cmd_help,
+    "/write": cmd_write,
+}
+
+TOOLS = [WRITE_TOOL]
+TOOL_FUNCTIONS = {
+    "write_file": write_file,
 }
 
 SYSTEM_PROMPT = """Você é o Duck AI, um assistente pessoal de programação.
@@ -37,6 +45,7 @@ Sua língua fluente é Português Brasileiro.
 
 Você roda dentro de um terminal chamado Duck Go, que tem os seguintes comandos disponíveis para o usuário:
 - /read <arquivo> - lê e envia o conteúdo de um arquivo do projeto para você analisar
+- /write <arquivo> - escreve ou sobescreve um arquivo que o usuário pedir
 - /clear - limpa o histórico da conversa atual
 - /help - mostra a lista de comandos
 
@@ -57,6 +66,19 @@ def parse_command(prompt: str, ai) -> str | None:
 
     console.print(f"[red]Comando desconhecido: {cmd}[/red]")
     return None
+
+def ensure_api_key(duck) -> str:
+    config = duck.load_config()
+    key = config.get("groq_api_key")
+
+    if not key:
+        console.print("[yellow]Nenhuma API key da Groq encontrada.[/yellow]")
+        key = console.input("[bold]Cole sua GROQ_API_KEY: [/bold]").strip()
+        config["groq_api_key"] = key
+        duck.save_config(config)
+        console.print("[green]Chave salva![/green]")
+
+    return key
 
 def show_menu():
     console.print(Align.center(Text(LOGO, style="bold yellow")))
@@ -137,7 +159,9 @@ def main():
 
             prompt = console.input("> ").strip()
 
-            if prompt.lower() == "iniciar chat":
+            if prompt.startswith("iniciar chat"):
+                console.print("[bold green] Iniciando Chat...[/bold green]")
+                time.sleep(2)
                 ai = AIClient(model=duck.get_model())
                 isAIinitialized = True
 
@@ -145,11 +169,9 @@ def main():
                 break
 
             if not prompt:
-                continue
+                console.print("[red] Algo deu errado. [/red]")
         
 
-        console.print("[bold green] Iniciando Chat...[/bold green]")
-        time.sleep(2)
         prompt = console.input("Você > ").strip()
         if prompt.lower() in ("sair", "exit", "quit"):
             isAIinitialized = False  # volta pro menu
@@ -166,6 +188,7 @@ def main():
 
         with console.status("[bold yellow]Duck AI está pensando...[/bold yellow]", spinner="line"):
             resp = ai.ask(prompt, system=SYSTEM_PROMPT)
+
         console.print(Markdown(resp))
 if __name__=="__main__":
     main()
