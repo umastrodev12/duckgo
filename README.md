@@ -6,7 +6,7 @@ Duck Go traz um chat com IA direto no seu terminal — sem depender de navegador
 
 ## ✨ Recursos
 
-- 💬 Chat com IA direto no terminal, com histórico de conversa
+- 💬 Chat com IA direto no terminal
 - 🎨 Respostas renderizadas em Markdown (negrito, código, listas, etc)
 - 📄 Leitura e análise de arquivos do seu projeto com `/read <arquivo>`
 - ⚙️ Configuração persistente (modelo padrão e API key) salva em `.duck/`
