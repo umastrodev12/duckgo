@@ -13,25 +13,6 @@ Duck Go traz um chat com IA direto no seu terminal — sem depender de navegador
 - 🚀 Rápido, graças à inferência da Groq (LPU)
 - 🇧🇷 Fluente em Português Brasileiro
 
-## 📦 Instalação
-
-### Windows (PowerShell)
-
-```powershell
-irm https://github.com/umastrodev12/duckgo/releases/latest/download/install.ps1 | iex
-```
-
-Isso baixa o executável mais recente, instala em `%LOCALAPPDATA%\DuckGo` e adiciona ao PATH automaticamente.
-
-### A partir do código-fonte
-
-```bash
-git clone https://github.com/umastrodev12/duckgo.git
-cd duckgo
-pip install -r requirements.txt
-python main.py
-```
-
 ## 🔑 Configuração
 
 Duck Go usa a API da Groq, que possui um **free tier** generoso.
