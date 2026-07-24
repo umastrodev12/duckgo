@@ -27,40 +27,36 @@ class AIClient:
 
         self.history.append({"role": "user", "content": prompt})
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=self.history,
-            tools=TOOLS,
-            tool_choice="auto",
-        )
+        max_iterations = 10  # limite de segurança, evita loop infinito
+        for _ in range(max_iterations):
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=self.history,
+                tools=TOOLS,
+                tool_choice="auto",
+            )
 
-        message = response.choices[0].message
+            message = response.choices[0].message
 
-        if message.tool_calls:
+            if not message.tool_calls:
+                reply = message.content
+                self.history.append({"role": "assistant", "content": reply})
+                return reply
+
             self.history.append(message)
 
             for call in message.tool_calls:
                 args = json.loads(call.function.arguments)
                 func = TOOL_FUNCTIONS[call.function.name]
-                result = TOOL_FUNCTIONS[call.function.name](**args)
+                result = func(**args)
+
                 self.history.append({
                     "role": "tool",
                     "tool_call_id": call.id,
                     "content": result,
                 })
 
-            followup = self.client.chat.completions.create(
-                model=self.model,
-                messages=self.history,
-            )
-            reply = followup.choices[0].message.content
-            self.history.append({"role": "assistant", "content": reply})
-            return reply
-
-        reply = message.content
-        self.history.append({"role": "assistant", "content": reply})
-        return reply
-
+        return "Limite de iterações atingido — a tarefa pode ser complexa demais para uma única resposta."
     @staticmethod
     def _strip_thinking(text: str) -> str:
         return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
