@@ -43,22 +43,7 @@ class AIClient:
                 self.history.append({"role": "assistant", "content": reply})
                 return reply
 
-            # converte pra dict corretamente antes de guardar
-            self.history.append({
-                "role": "assistant",
-                "content": message.content,
-                "tool_calls": [
-                    {
-                        "id": call.id,
-                        "type": "function",
-                        "function": {
-                            "name": call.function.name,
-                            "arguments": call.function.arguments,
-                        }
-                    }
-                    for call in message.tool_calls
-                ]
-            })
+            self.history.append(message)
 
             for call in message.tool_calls:
                 args = json.loads(call.function.arguments)
@@ -71,8 +56,7 @@ class AIClient:
                     "content": result,
                 })
 
-        return "Limite de iterações atingido."
-
+        return "Limite de iterações atingido — a tarefa pode ser complexa demais para uma única resposta."
     @staticmethod
     def _strip_thinking(text: str) -> str:
         return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
