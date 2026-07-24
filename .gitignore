@@ -1,0 +1,10 @@
+.env
+duckgo.egg-info/
+__pycache__/
+
+.env.local
+.env.*
+.duck/
+.duck-plugin/
+
+duckgo.spec
