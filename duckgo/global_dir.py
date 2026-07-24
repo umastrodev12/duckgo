@@ -1,9 +1,12 @@
+from rich.console import Console
 import os
 import json
 
+console = Console()
+
 GLOBAL_DIR = ".duck"
 CONFIG_FILE = "config.json"
-DEFAULT_MODEL = "qwen/qwen3-32b"
+DEFAULT_MODEL = "openai/gpt-oss-20b"
 
 class globalDir:
     def  __init__(self, root) -> None:
