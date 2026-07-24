@@ -6,6 +6,7 @@ from duckgo.command_reader import (
     cmd_clear,
     cmd_help,
     cmd_read,
+    cmd_auto_approve,
 )
 from rich.markdown import Markdown
 from dotenv import load_dotenv
@@ -34,6 +35,7 @@ LOGO = """
 COMMANDS = {
     "/read": cmd_read,
     "/help": cmd_help,
+    "/auto": cmd_auto_approve,
 }
 
 TOOLS = [WRITE_TOOL, RUN_COMMAND_TOOL]

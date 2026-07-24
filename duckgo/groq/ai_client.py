@@ -20,46 +20,58 @@ class AIClient:
         self.client = Groq(api_key=api_key)
         self.model = model
         self.history: list[dict] = []
-
+        
     def ask(self, prompt: str, system: str | None = None) -> str:
         if system and not self.history:
             self.history.append({"role": "system", "content": system})
 
         self.history.append({"role": "user", "content": prompt})
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=self.history,
-            tools=TOOLS,
-            tool_choice="auto",
-        )
+        max_iterations = 15
+        for _ in range(max_iterations):
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=self.history,
+                tools=TOOLS,
+                tool_choice="auto",
+            )
 
-        message = response.choices[0].message
+            message = response.choices[0].message
 
-        if message.tool_calls:
-            self.history.append(message)
+            if not message.tool_calls:
+                reply = message.content
+                self.history.append({"role": "assistant", "content": reply})
+                return reply
+
+            # converte pra dict corretamente antes de guardar
+            self.history.append({
+                "role": "assistant",
+                "content": message.content,
+                "tool_calls": [
+                    {
+                        "id": call.id,
+                        "type": "function",
+                        "function": {
+                            "name": call.function.name,
+                            "arguments": call.function.arguments,
+                        }
+                    }
+                    for call in message.tool_calls
+                ]
+            })
 
             for call in message.tool_calls:
                 args = json.loads(call.function.arguments)
                 func = TOOL_FUNCTIONS[call.function.name]
-                result = TOOL_FUNCTIONS[call.function.name](**args)
+                result = func(**args)
+
                 self.history.append({
                     "role": "tool",
                     "tool_call_id": call.id,
                     "content": result,
                 })
 
-            followup = self.client.chat.completions.create(
-                model=self.model,
-                messages=self.history,
-            )
-            reply = followup.choices[0].message.content
-            self.history.append({"role": "assistant", "content": reply})
-            return reply
-
-        reply = message.content
-        self.history.append({"role": "assistant", "content": reply})
-        return reply
+        return "Limite de iterações atingido."
 
     @staticmethod
     def _strip_thinking(text: str) -> str:

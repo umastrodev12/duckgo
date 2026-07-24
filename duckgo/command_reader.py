@@ -37,3 +37,9 @@ def cmd_clear(args: list[str], ai) -> None:
     ai.history.clear()
     console.print("[dim]Histórico limpo.[/dim]")
     return None
+
+def cmd_auto_approve(args: list[str]) -> None:
+    import duckgo.tools as tools_module
+    tools_module.AUTO_APPROVE_WRITE = not tools_module.AUTO_APPROVE_WRITE
+    status = "ativado" if tools_module.AUTO_APPROVE_WRITE else "desativado"
+    console.print(f"[green]Auto-aprovar criação de arquivos: {status}[/green]")

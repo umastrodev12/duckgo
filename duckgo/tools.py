@@ -55,22 +55,17 @@ def set_active_status(status):
     _active_status = status
 
 
+AUTO_APPROVE_WRITE = True   # arquivos: sem confirmação
+AUTO_APPROVE_COMMANDS = False  # comandos de shell: continua pedindo
+
 def write_file(path: str, content: str) -> str:
-    global _active_status
+    if not AUTO_APPROVE_WRITE:
+        console.print(f"[yellow]Duck AI quer criar:[/yellow] {path}")
+        confirm = console.input("[bold]Permitir? (s/n): [/bold]").strip().lower()
+        if confirm != "s":
+            return "Usuário negou a criação do arquivo."
 
-    if _active_status:
-        _active_status.stop()
-
-    console.print(f"[yellow]Duck AI quer criar o arquivo:[/yellow] [bold]{path}[/bold]")
-    console.print(f"[dim]{content[:300]}{'...' if len(content) > 300 else ''}[/dim]")
-
-    if _active_status:
-        _active_status.start()
-
-    confirm = console.input("[bold]Permitir? (s/n): [/bold]").strip().lower()
-    if confirm != "s":
-        return "Usuário negou a criação do arquivo."
-
+    console.print(f"[dim]📝 Criando {path}...[/dim]")
     try:
         dirname = os.path.dirname(path)
         if dirname:
