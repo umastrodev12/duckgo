@@ -10,7 +10,7 @@ DuckGo é uma assistente de IA de programação(similar ao Claude Code) direto n
 Para instalar o DuckGo, você precisa clonar o repositório, para clonar siga os passos abaixo <3
 
 > [!NOTE]
-Você precisa ter o Python 3 ou superior instalado na sua máquina.
+Você precisa ter o [Bun](https://bun.com) instalado na sua máquina.
 
 1. Rode o comando git
 ```bash
