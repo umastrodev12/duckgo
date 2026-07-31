@@ -1,0 +1,9 @@
+bin/
+node_modules/
+.duck/
+.duck-plugin/
+
+.env
+.env.*
+.env.*.local
+.env.local
